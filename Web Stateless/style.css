@@ -1,0 +1,9 @@
+/*
+  CINEPLEX — Global CSS Supplement
+  Tailwind handles utilities; file ini untuk override dan animasi custom
+*/
+
+/* Tailwind membutuhkan ini sebagai base */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

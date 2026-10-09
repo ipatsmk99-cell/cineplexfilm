@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CINEPLEX – Nonton Film & Series Favorit</title>
+  <meta name="description" content="Platform streaming film premium. Nikmati ribuan film dan series terbaik dari seluruh dunia di CINEPLEX." />
+
+  <!-- Tailwind CSS CDN -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            void: '#030305',
+            deep: '#09090f',
+            surface: '#0f0f1a',
+            card: '#12121f',
+            purple: {
+              950: '#0d0019',
+              900: '#1a0533',
+              800: '#2d0a5c',
+              700: '#4a1080',
+              600: '#6d28d9',
+              500: '#8b5cf6',
+              400: '#a855f7',
+              300: '#c084fc',
+              200: '#dda0f8',
+              100: '#f3e8ff',
+            }
+          },
+          fontFamily: {
+            display: ['Outfit', 'sans-serif'],
+            body: ['Inter', 'sans-serif'],
+          },
+          backdropBlur: { xs: '2px' },
+          animation: {
+            'fade-in': 'fadeIn 0.3s ease',
+            'slide-up': 'slideUp 0.4s cubic-bezier(0.34,1.56,0.64,1)',
+            'pulse-dot': 'pulseDot 2s infinite',
+            'bar-dance': 'barDance 1s ease-in-out infinite',
+            'shimmer': 'shimmer 1.8s infinite',
+            'float': 'float 6s ease-in-out infinite',
+            'hero-zoom': 'heroZoom 30s linear infinite alternate',
+            'spin-slow': 'spin 3s linear infinite',
+          },
+          keyframes: {
+            fadeIn: { from: { opacity: '0' }, to: { opacity: '1' } },
+            slideUp: {
+              from: { opacity: '0', transform: 'translateY(30px) scale(0.97)' },
+              to: { opacity: '1', transform: 'translateY(0) scale(1)' }
+            },
+            pulseDot: {
+              '0%,100%': { opacity: '1', transform: 'scale(1)' },
+              '50%': { opacity: '0.6', transform: 'scale(1.3)' }
+            },
+            barDance: {
+              '0%,100%': { height: '10px' },
+              '50%': { height: '36px' }
+            },
+            shimmer: {
+              '0%': { backgroundPosition: '200% 0' },
+              '100%': { backgroundPosition: '-200% 0' }
+            },
+            float: {
+              '0%,100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-10px)' }
+            },
+            heroZoom: {
+              from: { transform: 'scale(1)' },
+              to: { transform: 'scale(1.06)' }
+            },
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Alpine.js CDN -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── Base ── */
+    :root {
+      --purple-400: #a855f7;
+      --purple-500: #8b5cf6;
+      --purple-600: #6d28d9;
+      --purple-glow: rgba(168,85,247,0.25);
+    }
+    * { box-sizing: border-box; }
+    html { scrollbar-width: thin; scrollbar-color: #6d28d9 #09090f; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #09090f; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(#4a1080, #8b5cf6); border-radius: 9999px; }
+    body { font-family: 'Inter', sans-serif; background: #030305; color: #f8f4ff; overflow-x: hidden; }
+
+    /* ── Shimmer Skeleton ── */
+    .skeleton {
+      background: linear-gradient(90deg, #12121f 25%, rgba(168,85,247,0.06) 50%, #12121f 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.8s infinite;
+    }
+
+    /* ── Gradient text ── */
+    .gradient-text {
+      background: linear-gradient(135deg, #fff 0%, #c084fc 50%, #a855f7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── Glow effects ── */
+    .glow-purple { box-shadow: 0 0 24px rgba(168,85,247,0.3); }
+    .glow-purple-lg { box-shadow: 0 0 48px rgba(168,85,247,0.35), 0 4px 24px rgba(0,0,0,0.6); }
+    .text-glow { text-shadow: 0 0 20px rgba(168,85,247,0.5); }
+    .border-glow { border-color: rgba(168,85,247,0.4); }
+
+    /* ── Movie card ── */
+    .movie-card { transition: transform 0.28s cubic-bezier(0.4,0,0.2,1), box-shadow 0.28s ease; }
+    .movie-card:hover { transform: translateY(-8px) scale(1.03); }
+    .movie-card:hover .card-overlay { opacity: 1; }
+    .movie-card:hover .card-poster { transform: scale(1.05); }
+    .card-overlay { transition: opacity 0.28s ease; }
+    .card-poster { transition: transform 0.5s cubic-bezier(0.4,0,0.2,1); }
+
+    /* ── Slider ── */
+    .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+    .hide-scroll::-webkit-scrollbar { display: none; }
+
+    /* ── Hero ── */
+    .hero-overlay {
+      background: linear-gradient(90deg, rgba(3,3,5,0.97) 0%, rgba(3,3,5,0.75) 50%, rgba(3,3,5,0.2) 100%),
+                  linear-gradient(0deg, rgba(3,3,5,1) 0%, rgba(3,3,5,0.45) 35%, transparent 65%);
+    }
+
+    /* ── Navbar scroll ── */
+    .navbar-scrolled {
+      background: rgba(6,6,14,0.92) !important;
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      box-shadow: 0 1px 0 rgba(168,85,247,0.12), 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    /* ── Trailer iframe ── */
+    .trailer-iframe { border: none; width: 100%; height: 100%; }
+
+    /* ── Rating bar ── */
+    .rating-fill { background: linear-gradient(90deg, #a855f7, #c084fc); transition: width 1s ease; }
+
+    /* ── Genre badge ── */
+    .genre-badge { border: 1px solid rgba(168,85,247,0.3); transition: all 0.2s ease; }
+    .genre-badge:hover, .genre-badge.active { background: rgba(168,85,247,0.2); border-color: rgba(168,85,247,0.6); color: #c084fc; }
+
+    /* ── Tab active ── */
+    .tab-active { color: #c084fc; border-bottom: 2px solid #a855f7; }
+
+    /* ── Btn pulse ── */
+    .btn-pulse { animation: btnPulse 2s ease-in-out infinite; }
+    @keyframes btnPulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(168,85,247,0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(168,85,247,0); }
+    }
+
+    /* ── Toast ── */
+    .toast-enter { animation: toastIn 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+    .toast-exit { animation: toastOut 0.3s ease forwards; }
+    @keyframes toastIn { from { opacity:0; transform:translateX(40px); } to { opacity:1; transform:translateX(0); } }
+    @keyframes toastOut { from { opacity:1; } to { opacity:0; transform:translateX(40px); } }
+
+    /* ── Stars ── */
+    .star-filled { color: #a855f7; }
+    .star-empty { color: #4a3f58; }
+
+    /* ── Scrollbar in modal ── */
+    .modal-scroll { overflow-y: auto; scrollbar-width: thin; scrollbar-color: #4a1080 transparent; }
+    .modal-scroll::-webkit-scrollbar { width: 4px; }
+    .modal-scroll::-webkit-scrollbar-thumb { background: #4a1080; border-radius: 9999px; }
+
+    /* ── Particle ── */
+    .particle {
+      position: absolute; border-radius: 50%;
+      background: #8b5cf6; opacity: 0;
+      animation: floatPart var(--dur, 10s) var(--delay, 0s) ease-in-out infinite;
+    }
+    @keyframes floatPart {
+      0% { transform: translateY(100vh) scale(0); opacity:0; }
+      10% { opacity: var(--op, 0.3); }
+      90% { opacity: var(--op, 0.3); }
+      100% { transform: translateY(-10vh) scale(1); opacity:0; }
+    }
+
+    /* ── Fullscreen backdrop ── */
+    [x-cloak] { display: none !important; }
+
+    /* ── Progress ring ── */
+    .progress-ring { transform: rotate(-90deg); }
+    .progress-ring-circle { transition: stroke-dashoffset 1s ease; }
+  </style>
+</head>
+<body
+  x-data="cineplex()"
+  x-init="init()"
+  @keydown.escape.window="handleEscape()"
+  class="bg-void min-h-screen"
+>
+
+  <!-- ══════════════════════ NAVBAR ══════════════════════════ -->
+  <nav
+    id="navbar"
+    class="fixed top-0 inset-x-0 z-50 h-16 flex items-center gap-6 px-6 md:px-8 transition-all duration-300"
+    :class="scrolled ? 'navbar-scrolled' : 'bg-transparent'"
+  >
+    <!-- Logo -->
+    <button
+      @click="goHome()"
+      class="flex items-center gap-2 flex-shrink-0 group"
+      aria-label="Beranda CINEPLEX"
+    >
+      <span class="text-purple-400 text-xl group-hover:drop-shadow-[0_0_10px_#a855f7] transition-all duration-300">&#9654;</span>
+      <span class="font-display font-black text-xl tracking-widest gradient-text">CINEPLEX</span>
+    </button>
+
+    <!-- Desktop Nav Links -->
+    <div class="hidden md:flex items-center gap-1">
+      <template x-for="tab in tabs.filter(t => t.id !== 'upcoming')" :key="tab.id">
+        <button
+          @click="setTab(tab.id)"
+          class="px-3.5 py-2 rounded-full text-sm font-display font-medium transition-all duration-200"
+          :class="activeTab === tab.id
+            ? 'text-purple-200 bg-purple-400/10'
+            : 'text-purple-200/60 hover:text-purple-200 hover:bg-white/5'"
+          x-text="tab.label"
+        ></button>
+      </template>
+
+      <!-- Tombol Tahun Rilis (Bisa di-scroll per tahunnya) — Sebelum Segera -->
+      <div class="relative" @click.outside="yearDropdownOpen = false">
+        <button
+          @click="yearDropdownOpen = !yearDropdownOpen"
+          class="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-display font-medium transition-all duration-200"
+          :class="selectedYear
+            ? 'text-purple-200 bg-purple-600/30 border border-purple-400/40 shadow-[0_0_12px_rgba(168,85,247,0.25)]'
+            : (yearDropdownOpen ? 'text-purple-200 bg-white/10' : 'text-purple-200/60 hover:text-purple-200 hover:bg-white/5')"
+          aria-haspopup="true"
+          :aria-expanded="yearDropdownOpen"
+        >
+          <span>📅</span>
+          <span x-text="selectedYear ? `Tahun: ${selectedYear}` : 'Tahun Rilis'"></span>
+          <svg class="w-3.5 h-3.5 transition-transform duration-200" :class="yearDropdownOpen ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        <!-- Dropdown Popover Tahun Scrollable -->
+        <div
+          x-show="yearDropdownOpen"
+          x-cloak
+          x-transition:enter="transition duration-200"
+          x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+          x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+          x-transition:leave="transition duration-150"
+          x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+          x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+          class="absolute top-full left-0 mt-2 w-60 rounded-2xl bg-[#0b0b16]/98 border border-purple-400/30 shadow-[0_16px_50px_rgba(0,0,0,0.85),0_0_24px_rgba(168,85,247,0.2)] backdrop-blur-2xl p-2.5 z-50 flex flex-col"
+        >
+          <div class="px-3 py-1.5 text-[11px] font-display font-semibold uppercase tracking-wider text-purple-300/80 border-b border-purple-400/15 flex items-center justify-between">
+            <span>Pilih Tahun Rilis</span>
+            <span class="text-[10px] text-purple-400/60 font-normal">Scroll ↓</span>
+          </div>
+
+          <!-- Pilihan Semua Tahun (Reset) -->
+          <button
+            @click="selectYear(null); yearDropdownOpen = false"
+            class="text-left px-3 py-2 mt-1.5 rounded-xl text-xs font-display font-medium text-purple-300 hover:bg-purple-600/20 transition-all flex items-center justify-between"
+            :class="!selectedYear ? 'bg-purple-600/25 text-white font-bold' : ''"
+          >
+            <span>✨ Semua Tahun (Reset)</span>
+            <span x-show="!selectedYear">✓</span>
+          </button>
+
+          <!-- List Scrollable Tahun (2026 s/d 1980) -->
+          <div class="mt-1.5 max-h-60 overflow-y-auto space-y-0.5 pr-1">
+            <template x-for="yr in availableYears" :key="yr">
+              <button
+                @click="selectYear(yr); yearDropdownOpen = false"
+                class="w-full text-left px-3 py-1.5 rounded-lg text-xs font-display transition-all flex items-center justify-between"
+                :class="selectedYear === yr
+                  ? 'bg-purple-600 text-white font-bold shadow-[0_0_10px_rgba(168,85,247,0.4)]'
+                  : 'text-white/70 hover:text-white hover:bg-white/5'"
+              >
+                <span x-text="yr"></span>
+                <span x-show="selectedYear === yr" class="text-[11px]">✓</span>
+              </button>
+            </template>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Segera (upcoming) -->
+      <template x-for="tab in tabs.filter(t => t.id === 'upcoming')" :key="tab.id">
+        <button
+          @click="setTab(tab.id)"
+          class="px-3.5 py-2 rounded-full text-sm font-display font-medium transition-all duration-200"
+          :class="activeTab === tab.id
+            ? 'text-purple-200 bg-purple-400/10'
+            : 'text-purple-200/60 hover:text-purple-200 hover:bg-white/5'"
+          x-text="tab.label"
+        ></button>
+      </template>
+    </div>
+
+    <!-- Right actions -->
+    <div class="flex items-center gap-3 ml-auto">
+      <!-- Search Bar -->
+      <div
+        class="flex items-center bg-white/5 border rounded-full overflow-hidden transition-all duration-500"
+        :class="searchOpen
+          ? 'border-purple-400/40 bg-purple-400/5 shadow-[0_0_0_3px_rgba(168,85,247,0.1)] w-56 md:w-72'
+          : 'border-white/10 w-10'"
+      >
+        <button
+          @click="searchOpen = !searchOpen; searchOpen && $nextTick(() => $refs.searchInput.focus())"
+          class="flex-shrink-0 w-10 h-10 flex items-center justify-center text-purple-300/70 hover:text-purple-300 transition-colors"
+          :aria-label="searchOpen ? 'Tutup pencarian' : 'Buka pencarian'"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </button>
+        <input
+          x-ref="searchInput"
+          x-show="searchOpen"
+          x-cloak
+          x-model="searchQuery"
+          @input.debounce.500ms="doSearch()"
+          @keydown.enter="doSearch()"
+          @keydown.escape="clearSearch()"
+          type="text"
+          placeholder="Cari film, series..."
+          class="bg-transparent outline-none text-white text-sm placeholder-purple-300/40 pr-4 w-full"
+          aria-label="Cari film atau series"
+          autocomplete="off"
+        />
+        <button
+          x-show="searchQuery"
+          x-cloak
+          @click="clearSearch()"
+          class="flex-shrink-0 w-8 h-8 flex items-center justify-center text-purple-300/50 hover:text-purple-300 transition-colors mr-1"
+          aria-label="Hapus pencarian"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <!-- Watchlist -->
+      <button
+        @click="showWatchlistPanel = !showWatchlistPanel"
+        class="relative hidden md:flex w-10 h-10 items-center justify-center rounded-full bg-white/5 border border-white/10 text-purple-300/70 hover:text-purple-300 hover:border-purple-400/40 hover:bg-purple-400/5 transition-all duration-200"
+        aria-label="Watchlist"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        <span
+          x-show="watchlist.length > 0"
+          x-text="watchlist.length"
+          class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-purple-500 text-white text-[10px] font-bold flex items-center justify-center"
+        ></span>
+      </button>
+
+      <!-- Avatar -->
+      <div class="w-9 h-9 rounded-full bg-gradient-to-br from-purple-700 to-purple-500 flex items-center justify-center font-display font-bold text-sm border-2 border-purple-400/40 cursor-pointer hover:shadow-[0_0_16px_rgba(168,85,247,0.4)] transition-all duration-200">C</div>
+
+      <!-- Hamburger -->
+      <button
+        @click="mobileMenuOpen = !mobileMenuOpen"
+        class="md:hidden flex flex-col gap-[5px] p-2"
+        :aria-expanded="mobileMenuOpen"
+        aria-label="Menu"
+      >
+        <span class="block w-5 h-0.5 bg-white transition-all duration-300" :class="mobileMenuOpen ? 'translate-y-[7px] rotate-45' : ''"></span>
+        <span class="block w-5 h-0.5 bg-white transition-all duration-300" :class="mobileMenuOpen ? 'opacity-0' : ''"></span>
+        <span class="block w-5 h-0.5 bg-white transition-all duration-300" :class="mobileMenuOpen ? '-translate-y-[7px] -rotate-45' : ''"></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div
+    x-show="mobileMenuOpen"
+    x-cloak
+    x-transition:enter="transition duration-300"
+    x-transition:enter-start="opacity-0 -translate-y-4"
+    x-transition:enter-end="opacity-100 translate-y-0"
+    x-transition:leave="transition duration-200"
+    x-transition:leave-start="opacity-100"
+    x-transition:leave-end="opacity-0 -translate-y-4"
+    class="fixed top-16 inset-x-0 z-40 bg-deep/95 backdrop-blur-xl border-b border-purple-400/10 py-4 px-6 flex flex-col gap-1"
+  >
+    <!-- Menu Item Sebelum Segera -->
+    <template x-for="tab in tabs.filter(t => t.id !== 'upcoming')" :key="tab.id">
+      <button
+        @click="setTab(tab.id); mobileMenuOpen = false"
+        class="text-left px-4 py-2.5 rounded-xl text-sm font-display font-medium transition-all"
+        :class="activeTab === tab.id ? 'text-purple-200 bg-purple-400/10' : 'text-purple-200/60 hover:text-purple-200 hover:bg-white/5'"
+        x-text="tab.label"
+      ></button>
+    </template>
+
+    <!-- Tahun Rilis Selector (Mobile Scrollable) -->
+    <div class="px-4 py-3 bg-purple-900/10 border border-purple-400/15 rounded-xl my-1">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-display font-bold text-purple-300 flex items-center gap-1.5">
+          <span>📅</span> Tahun Rilis
+        </span>
+        <button
+          x-show="selectedYear"
+          @click="selectYear(null); mobileMenuOpen = false"
+          class="text-[11px] text-purple-400 hover:text-purple-300 underline"
+        >Reset</button>
+      </div>
+      <div class="flex gap-1.5 overflow-x-auto hide-scroll pb-1">
+        <button
+          @click="selectYear(null); mobileMenuOpen = false"
+          class="px-3 py-1 rounded-full text-xs font-display font-semibold flex-shrink-0 transition-all"
+          :class="!selectedYear ? 'bg-purple-600 text-white' : 'bg-white/5 text-white/60'"
+        >Semua</button>
+        <template x-for="yr in availableYears" :key="yr">
+          <button
+            @click="selectYear(yr); mobileMenuOpen = false"
+            class="px-3 py-1 rounded-full text-xs font-display font-semibold flex-shrink-0 transition-all"
+            :class="selectedYear === yr ? 'bg-purple-600 text-white shadow-[0_0_8px_rgba(168,85,247,0.4)]' : 'bg-white/5 text-white/60 hover:text-white'"
+            x-text="yr"
+          ></button>
+        </template>
+      </div>
+    </div>
+
+    <!-- Segera (Upcoming) -->
+    <template x-for="tab in tabs.filter(t => t.id === 'upcoming')" :key="tab.id">
+      <button
+        @click="setTab(tab.id); mobileMenuOpen = false"
+        class="text-left px-4 py-2.5 rounded-xl text-sm font-display font-medium transition-all"
+        :class="activeTab === tab.id ? 'text-purple-200 bg-purple-400/10' : 'text-purple-200/60 hover:text-purple-200 hover:bg-white/5'"
+        x-text="tab.label"
+      ></button>
+    </template>
+    <hr class="border-purple-400/10 my-2" />
+    <button @click="showWatchlistPanel = true; mobileMenuOpen = false" class="text-left px-4 py-3 rounded-xl text-sm font-display font-medium text-purple-200/60 hover:text-purple-200 hover:bg-white/5 flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+      Watchlist (<span x-text="watchlist.length"></span>)
+    </button>
+  </div>
+
+  <!-- ══════════════════════ HERO ══════════════════════════ -->
+  <section
+    class="relative min-h-[85svh] max-h-[900px] flex items-center overflow-hidden"
+    x-show="!searchActive"
+    x-cloak
+  >
+    <!-- Particles -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden" id="hero-particles"></div>
+
+    <!-- Background -->
+    <div
+      class="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-700"
+      :class="heroMovie?.backdrop_path ? 'animate-hero-zoom' : ''"
+      :style="heroMovie?.backdrop_path ? `background-image: url(https://image.tmdb.org/t/p/w1280${heroMovie.backdrop_path})` : 'background: #0d0019'"
+    ></div>
+    <div class="hero-overlay absolute inset-0"></div>
+
+    <!-- Content -->
+    <div class="relative z-10 max-w-2xl px-6 md:px-12 pt-20">
+      <div x-show="heroMovie" x-cloak>
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-400/10 border border-purple-400/30 rounded-full mb-5">
+          <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse-dot"></span>
+          <span class="text-purple-300 text-xs font-display font-semibold tracking-widest uppercase">Trending Sekarang</span>
+        </div>
+        <h1
+          class="font-display font-black leading-tight mb-4 text-white"
+          style="font-size: clamp(2rem,5vw,3.8rem); letter-spacing:-0.02em; text-shadow:0 2px 30px rgba(0,0,0,0.5)"
+          x-text="heroMovie?.title || heroMovie?.name"
+        ></h1>
+        <div class="flex flex-wrap items-center gap-3 mb-4">
+          <span class="flex items-center gap-1.5 font-display font-bold text-purple-300 text-base">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#a855f7"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span x-text="heroMovie?.vote_average?.toFixed(1)"></span>
+          </span>
+          <span class="text-sm text-white/60 bg-white/8 border border-white/10 px-3 py-1 rounded-full" x-text="(heroMovie?.release_date||heroMovie?.first_air_date||'').slice(0,4)"></span>
+          <template x-for="gid in (heroMovie?.genre_ids||[]).slice(0,2)" :key="gid">
+            <span class="text-xs text-purple-300 bg-purple-400/10 border border-purple-400/20 px-3 py-1 rounded-full" x-text="GENRES[gid]"></span>
+          </template>
+        </div>
+        <p class="text-white/70 text-[15px] leading-relaxed mb-7 line-clamp-3 max-w-xl" x-text="heroMovie?.overview || 'Tidak ada deskripsi.'"></p>
+        <div class="flex flex-wrap gap-3">
+          <button
+            @click="playHeroTrailer()"
+            class="btn-pulse flex items-center gap-2 px-7 py-3 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-display font-bold text-sm rounded-full transition-all duration-300 hover:-translate-y-0.5 shadow-[0_4px_24px_rgba(168,85,247,0.4)]"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Putar Trailer
+          </button>
+          <button
+            @click="openModal(heroMovie, heroType)"
+            class="flex items-center gap-2 px-7 py-3 bg-white/10 hover:bg-white/15 text-white font-display font-semibold text-sm rounded-full border border-white/15 hover:border-purple-400/40 backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5"
+          >
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Info Detail
+          </button>
+        </div>
+      </div>
+
+      <!-- Hero Skeleton -->
+      <div x-show="!heroMovie" class="space-y-4">
+        <div class="skeleton h-5 w-36 rounded-full"></div>
+        <div class="skeleton h-14 w-96 max-w-full rounded-xl"></div>
+        <div class="flex gap-2"><div class="skeleton h-6 w-14 rounded-full"></div><div class="skeleton h-6 w-20 rounded-full"></div></div>
+        <div class="skeleton h-16 w-full max-w-lg rounded-xl"></div>
+        <div class="flex gap-3"><div class="skeleton h-12 w-36 rounded-full"></div><div class="skeleton h-12 w-32 rounded-full"></div></div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ══════════════════════ SEARCH RESULTS ══════════════════ -->
+  <section
+    x-show="searchActive"
+    x-cloak
+    class="min-h-screen pt-24 pb-16 px-4 md:px-8"
+  >
+    <div class="max-w-7xl mx-auto">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="font-display font-bold text-xl text-white">
+          Hasil: <span class="text-purple-300">"<span x-text="searchQuery"></span>"</span>
+          <span class="text-purple-400/60 text-base font-normal ml-2" x-show="!searchLoading && searchResults.length > 0">(<span x-text="searchResults.length"></span> film)</span>
+        </h2>
+        <button @click="clearSearch()" class="text-sm text-purple-400 hover:text-purple-300 border border-purple-400/30 px-4 py-1.5 rounded-full transition-all hover:border-purple-400/60">
+          &larr; Kembali
+        </button>
+      </div>
+
+      <!-- Search Loading -->
+      <div x-show="searchLoading" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+        <template x-for="i in 12" :key="i">
+          <div class="skeleton rounded-xl" style="aspect-ratio:2/3"></div>
+        </template>
+      </div>
+
+      <!-- Results Grid -->
+      <div
+        x-show="!searchLoading && searchResults.length > 0"
+        class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"
+      >
+        <template x-for="movie in searchResults" :key="movie.id">
+          <div
+            @click="openModal(movie, movie.media_type === 'tv' ? 'tv' : 'movie')"
+            class="movie-card cursor-pointer rounded-2xl overflow-hidden bg-card border border-purple-400/10 relative"
+            :class="{'glow-purple-lg': hoveredCard === movie.id}"
+            @mouseenter="hoveredCard = movie.id"
+            @mouseleave="hoveredCard = null"
+          >
+            <img
+              :src="movie.poster_path ? `https://image.tmdb.org/t/p/w342${movie.poster_path}` : '/api/placeholder/342/513'"
+              :alt="movie.title || movie.name"
+              class="card-poster w-full object-cover"
+              style="aspect-ratio:2/3"
+              loading="lazy"
+              onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22342%22 height=%22513%22%3E%3Crect fill=%22%2312121f%22 width=%22342%22 height=%22513%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 fill=%22%234a1080%22 text-anchor=%22middle%22 font-size=%2218%22%3ENo Image%3C/text%3E%3C/svg%3E'"
+            />
+            <div class="card-overlay absolute inset-0 opacity-0 flex flex-col justify-end p-3"
+              style="background:linear-gradient(0deg,rgba(9,9,15,0.98) 0%,rgba(9,9,15,0.55) 40%,transparent 70%)">
+              <p class="font-display font-bold text-white text-xs leading-tight mb-1 line-clamp-2" x-text="movie.title || movie.name"></p>
+              <div class="flex items-center justify-between">
+                <span class="flex items-center gap-1 text-purple-300 text-xs font-bold">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="#a855f7"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  <span x-text="movie.vote_average?.toFixed(1)"></span>
+                </span>
+                <button class="w-7 h-7 rounded-full bg-gradient-to-br from-purple-600 to-purple-500 flex items-center justify-center shadow-lg">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                </button>
+              </div>
+            </div>
+            <!-- Badge type -->
+            <div x-show="movie.media_type === 'tv'" class="absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 bg-purple-600/80 text-white rounded-full">TV</div>
+          </div>
+        </template>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        x-show="!searchLoading && searchResults.length === 0 && searchQuery"
+        class="flex flex-col items-center justify-center py-24 gap-5"
+      >
+        <div class="w-20 h-20 rounded-full bg-purple-900/40 border border-purple-400/20 flex items-center justify-center text-4xl animate-float">&#128269;</div>
+        <div class="text-center">
+          <h3 class="font-display font-bold text-xl text-white mb-2">Tidak Ada Hasil</h3>
+          <p class="text-white/50 text-sm">Film "<span class="text-purple-300" x-text="searchQuery"></span>" tidak ditemukan.</p>
+          <p class="text-white/40 text-sm mt-1">Coba kata kunci yang berbeda.</p>
+        </div>
+        <button @click="clearSearch()" class="px-6 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-display font-semibold text-sm rounded-full transition-all">
+          Kembali ke Beranda
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════ MAIN CONTENT ══════════════════ -->
+  <main
+    x-show="!searchActive"
+    x-cloak
+    class="relative z-10 max-w-[1400px] mx-auto px-4 md:px-8 pb-20"
+    style="margin-top: -60px;"
+  >
+    <!-- ── Genre Filter ── -->
+    <div class="flex items-center gap-2 overflow-x-auto hide-scroll pb-2 mb-8 pt-4">
+      <button
+        @click="filterGenre = null; loadCurrentTab()"
+        class="genre-badge flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-display font-semibold text-white/60 transition-all"
+        :class="filterGenre === null ? 'active' : ''"
+      >Semua</button>
+      <template x-for="(label, gid) in GENRES" :key="gid">
+        <button
+          @click="filterGenre = parseInt(gid); applyGenreFilter()"
+          class="genre-badge flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-display font-semibold text-white/60 transition-all"
+          :class="filterGenre === parseInt(gid) ? 'active' : ''"
+          x-text="label"
+        ></button>
+      </template>
+    </div>
+
+    <!-- ── Seksi Khusus Film Berdasarkan Tahun Rilis (Aktif Saat Tahun Dipilih) ── -->
+    <section
+      id="section-year"
+      class="mb-12 animate-fade-in"
+      x-show="selectedYear"
+      x-cloak
+    >
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-display font-bold text-lg md:text-xl text-white flex items-center gap-2">
+          <span>📅</span>
+          <span>Film Pilihan Rilis Tahun <span class="text-purple-400 font-extrabold" x-text="selectedYear"></span></span>
+          <span class="text-xs text-purple-300/60 font-normal ml-2" x-show="!yearLoading && yearMovies.length > 0">(<span x-text="yearMovies.length"></span> film)</span>
+        </h2>
+        <button
+          @click="selectYear(null)"
+          class="text-xs font-display font-semibold text-purple-300 hover:text-white border border-purple-400/30 hover:border-purple-400/60 bg-purple-400/10 px-3.5 py-1.5 rounded-full transition-all flex items-center gap-1.5"
+        >
+          <span>✕ Tutup Filter Tahun</span>
+        </button>
+      </div>
+
+      <!-- Slider Section Year -->
+      <div class="relative group">
+        <button
+          @click="scrollSlider('year', -1)"
+          class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 z-10 w-10 h-10 rounded-full bg-deep/90 backdrop-blur-sm border border-purple-400/30 text-white text-xl flex items-center justify-center hover:bg-purple-700 hover:border-purple-500 hover:shadow-[0_0_16px_rgba(168,85,247,0.4)] transition-all opacity-0 group-hover:opacity-100"
+          aria-label="Sebelumnya"
+        >&#8249;</button>
+
+        <!-- Skeleton Loading -->
+        <div x-show="yearLoading" class="flex gap-3 overflow-hidden">
+          <template x-for="i in 8" :key="i">
+            <div class="flex-shrink-0 skeleton rounded-xl" style="width:168px;aspect-ratio:2/3"></div>
+          </template>
+        </div>
+
+        <!-- Cards -->
+        <div
+          x-show="!yearLoading"
+          id="slider-year"
+          class="flex gap-3 overflow-x-auto hide-scroll scroll-smooth pb-2"
+        >
+          <template x-for="(movie, index) in yearMovies" :key="movie.id">
+            <div
+              @click="openModal(movie, 'movie')"
+              class="movie-card flex-shrink-0 cursor-pointer rounded-xl overflow-hidden bg-card border border-purple-400/15 hover:border-purple-400/40 relative"
+              :class="{'glow-purple-lg border-purple-400/40': hoveredCard === `year-${movie.id}`}"
+              @mouseenter="hoveredCard = `year-${movie.id}`"
+              @mouseleave="hoveredCard = null"
+              style="width:168px"
+              role="button"
+              :aria-label="movie.title || movie.name"
+              tabindex="0"
+              @keydown.enter="openModal(movie, 'movie')"
+            >
+              <img
+                :src="movie.poster_path ? `https://image.tmdb.org/t/p/w342${movie.poster_path}` : ''"
+                :alt="movie.title || movie.name"
+                class="card-poster w-full object-cover"
+                style="aspect-ratio:2/3"
+                loading="lazy"
+                onerror="this.style.background='#12121f'; this.style.minHeight='252px'"
+              />
+              <div class="card-overlay absolute inset-0 opacity-0 flex flex-col justify-end p-3"
+                style="background:linear-gradient(0deg,rgba(9,9,15,0.98) 0%,rgba(9,9,15,0.55) 40%,transparent 70%)">
+                <p class="font-display font-bold text-white text-[11px] leading-tight mb-1.5 line-clamp-2" x-text="movie.title || movie.name"></p>
+                <div class="flex items-center gap-2 justify-between">
+                  <span class="flex items-center gap-1 text-purple-300 text-[11px] font-bold">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="#a855f7"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <span x-text="movie.vote_average?.toFixed(1)"></span>
+                  </span>
+                  <span class="text-white/50 text-[10px]" x-text="(movie.release_date||movie.first_air_date||'').slice(0,4)"></span>
+                  <button
+                    @click.stop="openModal(movie, 'movie')"
+                    class="w-7 h-7 rounded-full bg-gradient-to-br from-purple-600 to-purple-500 flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
+                  >
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </template>
+
+          <div x-show="yearMovies.length === 0 && !yearLoading" class="flex flex-col items-center gap-2 py-10 w-full text-center">
+            <p class="text-white/50 text-sm">Tidak ada data film ditemukan untuk tahun ini.</p>
+          </div>
+        </div>
+
+        <button
+          @click="scrollSlider('year', 1)"
+          class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 z-10 w-10 h-10 rounded-full bg-deep/90 backdrop-blur-sm border border-purple-400/30 text-white text-xl flex items-center justify-center hover:bg-purple-700 hover:border-purple-500 hover:shadow-[0_0_16px_rgba(168,85,247,0.4)] transition-all opacity-0 group-hover:opacity-100"
+          aria-label="Berikutnya"
+        >&#8250;</button>
+      </div>
+    </section>
+
+    <!-- ── Tab Sections ── -->
+    <template x-for="section in sections" :key="section.id">
+      <section
+        class="mb-12"
+        x-show="activeTab === 'home' || activeTab === section.id"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-display font-bold text-lg md:text-xl text-white flex items-center gap-2">
+            <span x-text="section.icon"></span>
+            <span x-text="section.label"></span>
+          </h2>
+          <button
+            @click="setTab(section.id)"
+            x-show="activeTab === 'home'"
+            class="text-xs font-display font-semibold text-purple-400 hover:text-purple-300 border border-purple-400/30 hover:border-purple-400/60 px-4 py-1.5 rounded-full transition-all"
+          >Lihat Semua &rarr;</button>
+        </div>
+
+        <!-- Slider -->
+        <div class="relative group">
+          <button
+            @click="scrollSlider(section.id, -1)"
+            class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 z-10 w-10 h-10 rounded-full bg-deep/90 backdrop-blur-sm border border-purple-400/30 text-white text-xl flex items-center justify-center hover:bg-purple-700 hover:border-purple-500 hover:shadow-[0_0_16px_rgba(168,85,247,0.4)] transition-all opacity-0 group-hover:opacity-100"
+            aria-label="Sebelumnya"
+          >&#8249;</button>
+
+          <!-- Skeleton -->
+          <div
+            x-show="section.loading"
+            class="flex gap-3 overflow-hidden"
+          >
+            <template x-for="i in 8" :key="i">
+              <div class="flex-shrink-0 skeleton rounded-xl" style="width:168px;aspect-ratio:2/3"></div>
+            </template>
+          </div>
+
+          <!-- Cards -->
+          <div
+            x-show="!section.loading"
+            :id="`slider-${section.id}`"
+            class="flex gap-3 overflow-x-auto hide-scroll scroll-smooth pb-2"
+          >
+            <template x-for="(movie, index) in getFilteredMovies(section)" :key="movie.id">
+              <div
+                @click="openModal(movie, section.type || 'movie')"
+                class="movie-card flex-shrink-0 cursor-pointer rounded-xl overflow-hidden bg-card border border-purple-400/10 relative"
+                :class="{'glow-purple-lg border-purple-400/30': hoveredCard === `${section.id}-${movie.id}`}"
+                @mouseenter="hoveredCard = `${section.id}-${movie.id}`"
+                @mouseleave="hoveredCard = null"
+                style="width:168px"
+                :style="activeTab !== 'home' ? 'width:auto;flex:0 0 168px' : ''"
+                role="button"
+                :aria-label="movie.title || movie.name"
+                tabindex="0"
+                @keydown.enter="openModal(movie, section.type || 'movie')"
+              >
+                <!-- Rank badge (trending only) -->
+                <div
+                  x-show="section.id === 'trending'"
+                  class="absolute top-2 left-2 z-10 text-[10px] font-display font-extrabold px-2 py-0.5 bg-purple-400/20 border border-purple-400/40 text-purple-300 rounded-full"
+                  x-text="`#${index + 1}`"
+                ></div>
+
+                <!-- Poster -->
+                <img
+                  :src="movie.poster_path ? `https://image.tmdb.org/t/p/w342${movie.poster_path}` : ''"
+                  :alt="movie.title || movie.name"
+                  class="card-poster w-full object-cover"
+                  style="aspect-ratio:2/3"
+                  loading="lazy"
+                  onerror="this.style.background='#12121f'; this.style.minHeight='252px'"
+                />
+
+                <!-- Overlay -->
+                <div class="card-overlay absolute inset-0 opacity-0 flex flex-col justify-end p-3"
+                  style="background:linear-gradient(0deg,rgba(9,9,15,0.98) 0%,rgba(9,9,15,0.55) 40%,transparent 70%)">
+                  <p class="font-display font-bold text-white text-[11px] leading-tight mb-1.5 line-clamp-2" x-text="movie.title || movie.name"></p>
+                  <div class="flex items-center gap-2 justify-between">
+                    <span class="flex items-center gap-1 text-purple-300 text-[11px] font-bold">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="#a855f7"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <span x-text="movie.vote_average?.toFixed(1)"></span>
+                    </span>
+                    <span class="text-white/50 text-[10px]" x-text="(movie.release_date||movie.first_air_date||'').slice(0,4)"></span>
+                    <button
+                      @click.stop="openModal(movie, section.type || 'movie')"
+                      class="w-7 h-7 rounded-full bg-gradient-to-br from-purple-600 to-purple-500 flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
+                    >
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <!-- Empty filtered state -->
+            <div
+              x-show="getFilteredMovies(section).length === 0 && !section.loading"
+              class="flex flex-col items-center gap-3 py-12 w-full"
+            >
+              <span class="text-3xl">&#127907;</span>
+              <p class="text-white/40 text-sm">Tidak ada film dengan genre ini.</p>
+            </div>
+          </div>
+
+          <button
+            @click="scrollSlider(section.id, 1)"
+            class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 z-10 w-10 h-10 rounded-full bg-deep/90 backdrop-blur-sm border border-purple-400/30 text-white text-xl flex items-center justify-center hover:bg-purple-700 hover:border-purple-500 hover:shadow-[0_0_16px_rgba(168,85,247,0.4)] transition-all opacity-0 group-hover:opacity-100"
+            aria-label="Berikutnya"
+          >&#8250;</button>
+        </div>
+      </section>
+    </template>
+  </main>
+
+  <!-- ══════════════════════ WATCHLIST PANEL ══════════════════ -->
+  <div
+    x-show="showWatchlistPanel"
+    x-cloak
+    @click.self="showWatchlistPanel = false"
+    class="fixed inset-0 z-50 flex justify-end animate-fade-in"
+    style="background:rgba(3,3,5,0.7); backdrop-filter:blur(4px)"
+  >
+    <div
+      x-show="showWatchlistPanel"
+      x-transition:enter="transition duration-300"
+      x-transition:enter-start="translate-x-full"
+      x-transition:enter-end="translate-x-0"
+      x-transition:leave="transition duration-200"
+      x-transition:leave-start="translate-x-0"
+      x-transition:leave-end="translate-x-full"
+      class="w-80 h-full bg-surface border-l border-purple-400/10 flex flex-col"
+    >
+      <div class="flex items-center justify-between p-5 border-b border-purple-400/10">
+        <h3 class="font-display font-bold text-white">Watchlist (<span x-text="watchlist.length"></span>)</h3>
+        <button @click="showWatchlistPanel = false" class="text-white/50 hover:text-white transition-colors">
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="flex-1 overflow-y-auto modal-scroll p-4 space-y-3">
+        <template x-if="watchlist.length === 0">
+          <div class="flex flex-col items-center gap-3 py-16 text-center">
+            <span class="text-4xl animate-float">&#127916;</span>
+            <p class="text-white/50 text-sm">Watchlist kosong.<br/>Tambahkan film favoritmu!</p>
+          </div>
+        </template>
+        <template x-for="item in watchlist" :key="item.id">
+          <div class="flex gap-3 items-start bg-card rounded-xl p-3 border border-purple-400/10 hover:border-purple-400/25 transition-all">
+            <img
+              :src="item.poster_path ? `https://image.tmdb.org/t/p/w92${item.poster_path}` : ''"
+              :alt="item.title"
+              class="w-12 rounded-lg object-cover flex-shrink-0"
+              style="aspect-ratio:2/3"
+              loading="lazy"
+            />
+            <div class="flex-1 min-w-0">
+              <p class="font-display font-semibold text-white text-sm truncate" x-text="item.title || item.name"></p>
+              <p class="text-white/40 text-xs mt-0.5" x-text="(item.release_date||item.first_air_date||'').slice(0,4)"></p>
+              <div class="flex items-center gap-1 mt-1">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="#a855f7"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span class="text-purple-300 text-xs font-bold" x-text="item.vote_average?.toFixed(1)"></span>
+              </div>
+            </div>
+            <button
+              @click="removeFromWatchlist(item.id)"
+              class="text-white/30 hover:text-red-400 transition-colors flex-shrink-0 mt-0.5"
+              aria-label="Hapus dari watchlist"
+            >
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            </button>
+          </div>
+        </template>
+      </div>
+      <div class="p-4 border-t border-purple-400/10" x-show="watchlist.length > 0">
+        <button @click="watchlist = []; showToast('Watchlist dikosongkan', '🗑️')" class="w-full py-2.5 text-sm font-display font-semibold text-red-400 hover:bg-red-400/10 rounded-xl transition-all border border-red-400/20 hover:border-red-400/40">
+          Kosongkan Semua
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ DETAIL MODAL ══════════════════ -->
+  <div
+    x-show="showModal"
+    x-cloak
+    @click.self="showModal = false"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 animate-fade-in modal-scroll"
+    style="background:rgba(3,3,5,0.88); backdrop-filter:blur(8px)"
+  >
+    <div
+      x-show="showModal"
+      x-transition:enter="transition duration-350"
+      x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+      x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+      class="relative w-full max-w-3xl bg-surface rounded-2xl overflow-hidden border border-purple-400/15 shadow-[0_24px_80px_rgba(0,0,0,0.8),0_0_60px_rgba(168,85,247,0.12)] max-h-[90vh] flex flex-col"
+    >
+      <!-- Close -->
+      <button
+        @click="showModal = false"
+        class="absolute top-4 right-4 z-30 w-9 h-9 rounded-full bg-black/60 backdrop-blur-sm border border-white/10 text-white/70 hover:text-white hover:border-purple-400/40 hover:bg-purple-400/10 flex items-center justify-center transition-all hover:rotate-90 duration-300"
+        aria-label="Tutup"
+      >
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+
+      <!-- Modal Loading -->
+      <div x-show="modalLoading" class="flex flex-col items-center justify-center gap-4 py-20">
+        <div class="w-10 h-10 border-3 border-purple-400/20 border-t-purple-400 rounded-full animate-spin-slow"></div>
+        <p class="text-white/50 text-sm">Memuat detail film...</p>
+      </div>
+
+      <!-- Modal Content -->
+      <div x-show="!modalLoading && selectedMovie" class="flex flex-col overflow-hidden">
+
+        <!-- Backdrop + Poster header -->
+        <div class="relative flex-shrink-0" style="min-height:240px">
+          <img
+            :src="selectedMovie?.backdrop_path ? `https://image.tmdb.org/t/p/w1280${selectedMovie.backdrop_path}` : ''"
+            :alt="selectedMovie?.title"
+            class="w-full object-cover object-top"
+            style="height:280px"
+            loading="lazy"
+          />
+          <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,15,26,0.97) 0%,rgba(15,15,26,0.7) 50%,transparent 100%),linear-gradient(0deg,rgba(15,15,26,1) 0%,rgba(15,15,26,0.55) 50%,transparent 100%)"></div>
+
+          <!-- Poster + Info -->
+          <div class="absolute inset-0 flex items-end gap-5 p-5 md:p-7">
+            <img
+              :src="selectedMovie?.poster_path ? `https://image.tmdb.org/t/p/w342${selectedMovie.poster_path}` : ''"
+              :alt="selectedMovie?.title"
+              class="hidden sm:block w-24 md:w-32 rounded-xl border-2 border-purple-400/40 shadow-xl flex-shrink-0 object-cover"
+              style="aspect-ratio:2/3"
+              loading="lazy"
+            />
+            <div class="flex-1 min-w-0">
+              <h2 class="font-display font-black text-white leading-tight mb-2" style="font-size:clamp(1.2rem,3vw,1.9rem)" x-text="selectedMovie?.title || selectedMovie?.name"></h2>
+              <div class="flex flex-wrap items-center gap-2 mb-3">
+                <!-- Star rating -->
+                <div class="flex items-center gap-1">
+                  <template x-for="i in 5" :key="i">
+                    <svg width="13" height="13" viewBox="0 0 24 24" :fill="i <= Math.round((selectedMovie?.vote_average || 0) / 2) ? '#a855f7' : '#4a3f58'"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  </template>
+                  <span class="text-purple-300 font-bold text-sm ml-1" x-text="selectedMovie?.vote_average?.toFixed(1)"></span>
+                  <span class="text-white/40 text-xs" x-text="`(${selectedMovie?.vote_count?.toLocaleString('id')} vote)`"></span>
+                </div>
+                <span class="text-white/60 text-sm px-2 py-0.5 bg-white/8 rounded-full border border-white/10" x-text="(selectedMovie?.release_date||selectedMovie?.first_air_date||'').slice(0,4)"></span>
+                <span class="text-white/50 text-sm" x-text="formatRuntime(selectedMovie?.runtime)"></span>
+                <span class="text-xs uppercase px-2 py-0.5 bg-white/8 border border-white/10 rounded-full text-white/60" x-text="selectedMovie?.original_language?.toUpperCase()"></span>
+              </div>
+              <!-- Genre badges -->
+              <div class="flex flex-wrap gap-1.5">
+                <template x-for="genre in (selectedMovie?.genres || [])" :key="genre.id">
+                  <span class="text-[11px] font-medium px-2.5 py-0.5 bg-purple-400/10 border border-purple-400/25 text-purple-300 rounded-full" x-text="genre.name"></span>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scrollable body -->
+        <div class="modal-scroll flex-1 overflow-y-auto">
+          <!-- Action Buttons -->
+          <div class="flex flex-wrap items-center gap-3 px-5 md:px-7 py-4 border-b border-purple-400/10">
+            <button
+              @click="openTrailer()"
+              :disabled="trailers.length === 0"
+              class="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 disabled:opacity-40 disabled:cursor-not-allowed text-white font-display font-bold text-sm rounded-full transition-all hover:-translate-y-0.5 shadow-[0_4px_20px_rgba(109,40,217,0.4)]"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <span x-text="trailers.length > 0 ? 'Nonton Trailer' : 'Trailer N/A'"></span>
+            </button>
+            <button
+              @click="toggleWatchlist(selectedMovie)"
+              class="flex items-center gap-2 px-5 py-2.5 text-sm font-display font-semibold rounded-full border transition-all hover:-translate-y-0.5"
+              :class="isInWatchlist(selectedMovie?.id)
+                ? 'bg-purple-400/15 border-purple-400/50 text-purple-300 hover:bg-purple-400/25'
+                : 'bg-white/5 border-white/15 text-white/70 hover:border-purple-400/40 hover:text-purple-300'"
+            >
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+                :fill="isInWatchlist(selectedMovie?.id) ? '#a855f7' : 'none'">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+              </svg>
+              <span x-text="isInWatchlist(selectedMovie?.id) ? 'Tersimpan' : '+ Watchlist'"></span>
+            </button>
+            <button
+              @click="toggleLike(selectedMovie)"
+              class="flex items-center gap-2 px-5 py-2.5 text-sm font-display font-semibold rounded-full border transition-all hover:-translate-y-0.5"
+              :class="isLiked(selectedMovie?.id)
+                ? 'bg-pink-500/15 border-pink-500/50 text-pink-300'
+                : 'bg-white/5 border-white/15 text-white/70 hover:border-pink-400/40 hover:text-pink-300'"
+            >
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+                :fill="isLiked(selectedMovie?.id) ? '#ec4899' : 'none'"
+                :stroke="isLiked(selectedMovie?.id) ? '#ec4899' : 'currentColor'">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+              <span x-text="isLiked(selectedMovie?.id) ? 'Disukai' : 'Suka'"></span>
+            </button>
+            <!-- Share -->
+            <button
+              @click="shareMovie(selectedMovie)"
+              class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white/60 hover:text-purple-300 hover:border-purple-400/40 transition-all"
+              aria-label="Bagikan"
+            >
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            </button>
+          </div>
+
+          <!-- Synopsis -->
+          <div class="px-5 md:px-7 py-5 border-b border-purple-400/10">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-display font-bold text-white flex items-center gap-2">
+                <span class="w-1 h-4 bg-gradient-to-b from-purple-500 to-purple-300 rounded-full"></span>
+                Sinopsis
+              </h3>
+              <span
+                x-show="selectedMovie?.overview"
+                class="text-[10px] font-semibold tracking-wider px-2.5 py-0.5 rounded-full border transition-all"
+                :class="selectedMovie?.isEnOverview ? 'bg-amber-500/10 border-amber-500/30 text-amber-300' : 'bg-purple-500/10 border-purple-500/30 text-purple-300'"
+                x-text="selectedMovie?.isEnOverview ? 'English Version' : 'Bahasa Indonesia'"
+              ></span>
+            </div>
+            <p class="text-white/75 text-sm md:text-[15px] leading-relaxed" x-text="selectedMovie?.overview || 'Sinopsis belum tersedia.'"></p>
+          </div>
+
+          <!-- Rating Bar + Details -->
+          <div class="px-5 md:px-7 py-5 border-b border-purple-400/10">
+            <h3 class="font-display font-bold text-white mb-4 flex items-center gap-2">
+              <span class="w-1 h-4 bg-gradient-to-b from-purple-500 to-purple-300 rounded-full"></span>
+              Informasi
+            </h3>
+            <!-- Rating progress bar -->
+            <div class="mb-4">
+              <div class="flex justify-between text-xs text-white/50 mb-1.5">
+                <span>Rating Penonton</span>
+                <span class="text-purple-300 font-bold" x-text="`${selectedMovie?.vote_average?.toFixed(1)} / 10`"></span>
+              </div>
+              <div class="h-2 bg-white/8 rounded-full overflow-hidden">
+                <div class="rating-fill h-full rounded-full" :style="`width:${(selectedMovie?.vote_average||0)*10}%`"></div>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div class="bg-card border border-purple-400/10 rounded-xl p-3 hover:border-purple-400/25 transition-all">
+                <p class="text-purple-400 text-[11px] font-semibold uppercase tracking-wider mb-1">Status</p>
+                <p class="text-white text-sm font-medium" x-text="selectedMovie?.status || '—'"></p>
+              </div>
+              <div class="bg-card border border-purple-400/10 rounded-xl p-3 hover:border-purple-400/25 transition-all">
+                <p class="text-purple-400 text-[11px] font-semibold uppercase tracking-wider mb-1">Durasi</p>
+                <p class="text-white text-sm font-medium" x-text="formatRuntime(selectedMovie?.runtime) || (selectedMovie?.number_of_seasons ? `${selectedMovie.number_of_seasons} Musim` : '—')"></p>
+              </div>
+              <div class="bg-card border border-purple-400/10 rounded-xl p-3 hover:border-purple-400/25 transition-all">
+                <p class="text-purple-400 text-[11px] font-semibold uppercase tracking-wider mb-1">Popularitas</p>
+                <p class="text-white text-sm font-medium" x-text="Math.round(selectedMovie?.popularity || 0).toLocaleString('id')"></p>
+              </div>
+              <div class="bg-card border border-purple-400/10 rounded-xl p-3 hover:border-purple-400/25 transition-all">
+                <p class="text-purple-400 text-[11px] font-semibold uppercase tracking-wider mb-1">Total Vote</p>
+                <p class="text-white text-sm font-medium" x-text="(selectedMovie?.vote_count||0).toLocaleString('id')"></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cast -->
+          <div class="px-5 md:px-7 py-5 border-b border-purple-400/10" x-show="cast.length > 0">
+            <h3 class="font-display font-bold text-white mb-4 flex items-center gap-2">
+              <span class="w-1 h-4 bg-gradient-to-b from-purple-500 to-purple-300 rounded-full"></span>
+              Pemeran Utama
+            </h3>
+            <div class="flex gap-4 overflow-x-auto hide-scroll pb-2">
+              <template x-for="person in cast.slice(0, 12)" :key="person.id">
+                <div class="flex-shrink-0 text-center w-20">
+                  <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-purple-400/20 mx-auto mb-2 bg-card hover:border-purple-400/50 transition-all">
+                    <img
+                      :src="person.profile_path ? `https://image.tmdb.org/t/p/w185${person.profile_path}` : ''"
+                      :alt="person.name"
+                      class="w-full h-full object-cover"
+                      loading="lazy"
+                      onerror="this.parentElement.innerHTML='<div class=\'w-full h-full flex items-center justify-center text-purple-400 text-xl bg-purple-900/30\'>&#128100;</div>'"
+                    />
+                  </div>
+                  <p class="text-white text-[11px] font-semibold leading-tight line-clamp-2" x-text="person.name"></p>
+                  <p class="text-white/40 text-[10px] line-clamp-1 mt-0.5" x-text="person.character"></p>
+                </div>
+              </template>
+            </div>
+          </div>
+
+          <!-- Similar Movies -->
+          <div class="px-5 md:px-7 py-5" x-show="similarMovies.length > 0">
+            <h3 class="font-display font-bold text-white mb-4 flex items-center gap-2">
+              <span class="w-1 h-4 bg-gradient-to-b from-purple-500 to-purple-300 rounded-full"></span>
+              Film Serupa
+            </h3>
+            <div class="flex gap-3 overflow-x-auto hide-scroll pb-2">
+              <template x-for="m in similarMovies.slice(0, 10)" :key="m.id">
+                <div
+                  @click="openModal(m, currentModalType)"
+                  class="flex-shrink-0 w-24 rounded-xl overflow-hidden border border-purple-400/10 cursor-pointer hover:border-purple-400/40 hover:scale-105 transition-all"
+                >
+                  <img
+                    :src="m.poster_path ? `https://image.tmdb.org/t/p/w92${m.poster_path}` : ''"
+                    :alt="m.title || m.name"
+                    class="w-full object-cover"
+                    style="aspect-ratio:2/3"
+                    loading="lazy"
+                    onerror="this.style.background='#12121f'; this.style.minHeight='144px'"
+                  />
+                </div>
+              </template>
+            </div>
+          </div>
+        </div><!-- end modal-scroll body -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ TRAILER MODAL ══════════════════ -->
+  <div
+    x-show="showTrailerModal"
+    x-cloak
+    @click.self="closeTrailer()"
+    class="fixed inset-0 z-[60] flex items-center justify-center p-3 md:p-8 animate-fade-in"
+    style="background:rgba(0,0,0,0.95); backdrop-filter:blur(12px)"
+  >
+    <div
+      x-show="showTrailerModal"
+      x-transition:enter="transition duration-300"
+      x-transition:enter-start="opacity-0 scale-95"
+      x-transition:enter-end="opacity-100 scale-100"
+      class="relative w-full max-w-4xl bg-card rounded-2xl overflow-hidden border border-purple-400/30 shadow-[0_0_80px_rgba(168,85,247,0.3)] flex flex-col"
+    >
+      <!-- Modal Header Bar -->
+      <div class="flex items-center justify-between px-4 py-3 bg-deep/90 border-b border-purple-400/15 z-20">
+        <div class="flex items-center gap-2 overflow-hidden">
+          <span class="text-purple-400">🎬</span>
+          <span class="text-white font-display font-semibold text-xs md:text-sm truncate" x-text="trailers[currentTrailerIndex]?.name || 'Trailer Film'"></span>
+        </div>
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <!-- Buka di YouTube fallback button -->
+          <a
+            x-show="trailers[currentTrailerIndex]?.key"
+            :href="`https://www.youtube.com/watch?v=${trailers[currentTrailerIndex]?.key}`"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-display font-medium bg-red-600/20 hover:bg-red-600/35 border border-red-500/30 text-red-200 transition-colors"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            Buka di YouTube
+          </a>
+          <button
+            @click="closeTrailer()"
+            class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-white/80 hover:text-white flex items-center justify-center transition-all hover:rotate-90 duration-300"
+            aria-label="Tutup trailer"
+          >
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Multiple trailer tabs selector (if > 1) -->
+      <div x-show="trailers.length > 1" class="px-4 py-2 bg-deep/60 border-b border-purple-400/10 flex gap-2 overflow-x-auto hide-scroll z-10">
+        <template x-for="(trailer, i) in trailers.slice(0, 5)" :key="trailer.key">
+          <button
+            @click="selectTrailer(i)"
+            class="text-xs px-3 py-1 rounded-full font-display font-semibold transition-all whitespace-nowrap"
+            :class="currentTrailerIndex === i ? 'bg-purple-600 text-white shadow-[0_0_12px_rgba(168,85,247,0.4)]' : 'bg-white/5 text-white/60 hover:text-white border border-white/10'"
+            x-text="trailer.type || `Trailer ${i+1}`"
+          ></button>
+        </template>
+      </div>
+
+      <!-- Video Player Frame -->
+      <div class="relative w-full bg-black flex items-center justify-center" style="aspect-ratio:16/9">
+        <template x-if="showTrailerModal && activeTrailerUrl">
+          <iframe
+            :src="activeTrailerUrl"
+            class="w-full h-full border-0 absolute inset-0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+            title="Movie Trailer"
+          ></iframe>
+        </template>
+
+        <!-- No trailer fallback -->
+        <div x-show="!activeTrailerUrl" class="flex flex-col items-center justify-center h-full gap-4 text-center p-6">
+          <div class="text-5xl animate-float">🎬</div>
+          <p class="text-white/70 font-display font-medium text-base">Trailer tidak dapat dimuat atau tidak tersedia.</p>
+          <button
+            @click="closeTrailer()"
+            class="px-5 py-2 rounded-full bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold"
+          >
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ TOAST CONTAINER ══════════════ -->
+  <div class="fixed bottom-6 right-6 z-[9999] flex flex-col gap-2.5 pointer-events-none" aria-live="polite">
+    <template x-for="toast in toasts" :key="toast.id">
+      <div
+        class="toast-enter flex items-center gap-3 px-4 py-3 rounded-xl bg-surface/95 border border-purple-400/30 shadow-[0_8px_32px_rgba(0,0,0,0.5),0_0_16px_rgba(168,85,247,0.15)] backdrop-blur-xl pointer-events-auto max-w-xs"
+      >
+        <span class="text-lg flex-shrink-0" x-text="toast.icon"></span>
+        <span class="font-display font-medium text-white text-sm" x-text="toast.msg"></span>
+      </div>
+    </template>
+  </div>
+
+  <!-- ══════════════════════ FOOTER ══════════════════════ -->
+  <footer
+    x-show="!searchActive"
+    x-cloak
+    class="border-t border-purple-400/10 py-10 px-6 bg-deep"
+  >
+    <div class="max-w-7xl mx-auto flex flex-col items-center gap-5 text-center">
+      <div class="flex items-center gap-2">
+        <span class="text-purple-400">&#9654;</span>
+        <span class="font-display font-black text-xl tracking-widest gradient-text">CINEPLEX</span>
+      </div>
+      <p class="text-white/30 text-sm">
+        &copy; 2026 CINEPLEX &mdash; Data film oleh
+        <a href="https://www.themoviedb.org" target="_blank" rel="noopener noreferrer" class="text-purple-400 hover:text-purple-300 transition-colors font-medium">TMDB</a>
+      </p>
+      <div class="flex flex-wrap justify-center gap-5">
+        <a href="#" class="text-white/30 hover:text-purple-400 text-xs transition-colors">Syarat & Ketentuan</a>
+        <a href="#" class="text-white/30 hover:text-purple-400 text-xs transition-colors">Kebijakan Privasi</a>
+        <a href="#" class="text-white/30 hover:text-purple-400 text-xs transition-colors">Bantuan</a>
+        <a href="#" class="text-white/30 hover:text-purple-400 text-xs transition-colors">Kontak</a>
+      </div>
+      <p class="text-white/20 text-[11px]">Aplikasi bersifat stateless &mdash; tidak menyimpan data autentikasi.</p>
+    </div>
+  </footer>
+
+  <!-- ══════════════════════ ALPINE.JS LOGIC ══════════════ -->
+  <script>
+    const API_KEY = '4783dd9ce734631581f19cace98e345b';
+    const BASE = 'https://api.themoviedb.org/3';
+
+    const GENRES = {
+      28:'Aksi', 12:'Petualangan', 16:'Animasi', 35:'Komedi', 80:'Kriminal',
+      99:'Dokumenter', 18:'Drama', 10751:'Keluarga', 14:'Fantasi', 36:'Sejarah',
+      27:'Horor', 10402:'Musik', 9648:'Misteri', 10749:'Romantis', 878:'Sci-Fi',
+      53:'Thriller', 10752:'Perang', 37:'Barat',
+    };
+
+    // Helper fetch TMDB dasar
+    async function tmdb(endpoint, params = {}) {
+      const url = new URL(`${BASE}${endpoint}`);
+      url.searchParams.set('api_key', API_KEY);
+      if (params.language !== undefined) {
+        if (params.language) url.searchParams.set('language', params.language);
+      } else {
+        url.searchParams.set('language', 'id-ID');
+      }
+      Object.entries(params).forEach(([k,v]) => {
+        if (k !== 'language') url.searchParams.set(k, v);
+      });
+      const r = await fetch(url);
+      if (!r.ok) throw new Error(`TMDB ${r.status}`);
+      return r.json();
+    }
+
+    // Helper untuk mengambil list film: jika overview ID kosong, ambil overview resmi versi EN
+    async function fetchMoviesWithFallback(endpoint, params = {}) {
+      try {
+        const [resId, resEn] = await Promise.all([
+          tmdb(endpoint, { ...params, language: 'id-ID' }).catch(() => null),
+          tmdb(endpoint, { ...params, language: 'en-US' }).catch(() => null),
+        ]);
+
+        const idList = resId?.results || [];
+        const enList = resEn?.results || [];
+        const enMap = new Map(enList.map(m => [m.id, m]));
+
+        const merged = (idList.length ? idList : enList).map(movie => {
+          const enMovie = enMap.get(movie.id);
+          const hasIdOverview = movie.overview && movie.overview.trim().length > 0;
+          const enOverview = enMovie?.overview && enMovie.overview.trim().length > 0 ? enMovie.overview : '';
+          return {
+            ...movie,
+            overview: hasIdOverview ? movie.overview : (enOverview || 'Sinopsis belum tersedia.'),
+            isEnOverview: !hasIdOverview && !!enOverview,
+            title: movie.title || movie.name || enMovie?.title || enMovie?.name || 'Untitled',
+          };
+        });
+
+        return {
+          ...(resId || resEn || {}),
+          results: merged
+        };
+      } catch (e) {
+        console.error('Error fetchMoviesWithFallback:', e);
+        return tmdb(endpoint, { ...params, language: 'en-US' }).catch(() => ({ results: [] }));
+      }
+    }
+
+    // Helper untuk mencari trailer video YouTube resmi
+    async function fetchTrailers(type, id) {
+      try {
+        // Ambil video dari default/global (tanpa bahasa) dan en-US dan id-ID
+        const [videosAll, videosEn, videosId] = await Promise.all([
+          tmdb(`/${type}/${id}/videos`, { language: '' }).catch(() => null),
+          tmdb(`/${type}/${id}/videos`, { language: 'en-US' }).catch(() => null),
+          tmdb(`/${type}/${id}/videos`, { language: 'id-ID' }).catch(() => null),
+        ]);
+
+        const rawList = [
+          ...(videosId?.results || []),
+          ...(videosAll?.results || []),
+          ...(videosEn?.results || []),
+        ];
+
+        // Filter duplikat berdasarkan key YouTube
+        const seen = new Set();
+        const unique = [];
+        for (const v of rawList) {
+          if (v.site === 'YouTube' && v.key && !seen.has(v.key)) {
+            seen.add(v.key);
+            unique.push(v);
+          }
+        }
+
+        // Urutkan prioritas: Trailer Resmi > Trailer > Teaser > Video lainnya
+        unique.sort((a, b) => {
+          const getScore = (v) => {
+            let s = 0;
+            if (v.type === 'Trailer') s += 10;
+            if (v.type === 'Teaser') s += 5;
+            if (v.official) s += 4;
+            if ((v.name || '').toLowerCase().includes('official trailer')) s += 6;
+            if ((v.name || '').toLowerCase().includes('trailer')) s += 2;
+            return s;
+          };
+          return getScore(b) - getScore(a);
+        });
+
+        return unique;
+      } catch (e) {
+        console.error('Error fetchTrailers:', e);
+        return [];
+      }
+    }
+
+    function cineplex() {
+      return {
+        // ── State ──
+        GENRES,
+        heroMovie: null,
+        heroType: 'movie',
+        scrolled: false,
+        mobileMenuOpen: false,
+        searchOpen: false,
+        searchQuery: '',
+        searchResults: [],
+        searchActive: false,
+        searchLoading: false,
+        showModal: false,
+        modalLoading: false,
+        selectedMovie: null,
+        currentModalType: 'movie',
+        cast: [],
+        similarMovies: [],
+        trailers: [],
+        showTrailerModal: false,
+        currentTrailerIndex: 0,
+        activeTrailerUrl: '',
+        showWatchlistPanel: false,
+        watchlist: [],
+        liked: [],
+        toasts: [],
+        hoveredCard: null,
+        filterGenre: null,
+        activeTab: 'home',
+
+        // ── Fitur Tahun Rilis ──
+        availableYears: Array.from({ length: 47 }, (_, i) => 2026 - i),
+        selectedYear: null,
+        yearDropdownOpen: false,
+        yearMovies: [],
+        yearLoading: false,
+
+        tabs: [
+          { id: 'home', label: 'Beranda' },
+          { id: 'trending', label: 'Trending' },
+          { id: 'now_playing', label: 'Tayang' },
+          { id: 'top_rated', label: 'Top Rating' },
+          { id: 'popular', label: 'Populer' },
+          { id: 'series', label: 'Series' },
+          { id: 'upcoming', label: 'Segera' },
+        ],
+
+        sections: [
+          { id: 'trending', label: 'Trending Minggu Ini', icon: '🔥', movies: [], loading: true, type: 'movie' },
+          { id: 'now_playing', label: 'Sedang Tayang', icon: '🎬', movies: [], loading: true, type: 'movie' },
+          { id: 'top_rated', label: 'Rating Tertinggi', icon: '⭐', movies: [], loading: true, type: 'movie' },
+          { id: 'popular', label: 'Populer Bulan Ini', icon: '💜', movies: [], loading: true, type: 'movie' },
+          { id: 'series', label: 'Series Populer', icon: '📺', movies: [], loading: true, type: 'tv' },
+          { id: 'upcoming', label: 'Segera Hadir', icon: '🚀', movies: [], loading: true, type: 'movie' },
+        ],
+
+        // ── Init ──
+        async init() {
+          this.spawnParticles();
+          this.initScroll();
+
+          // Fetch all data dengan fallback sinopsis (ID -> EN)
+          const [trending, nowPlaying, topRated, popular, series, upcoming] = await Promise.all([
+            fetchMoviesWithFallback('/trending/all/week'),
+            fetchMoviesWithFallback('/movie/now_playing'),
+            fetchMoviesWithFallback('/movie/top_rated'),
+            fetchMoviesWithFallback('/movie/popular'),
+            fetchMoviesWithFallback('/tv/popular'),
+            fetchMoviesWithFallback('/movie/upcoming'),
+          ]);
+
+          // Hero
+          const heroSrc = trending?.results || popular?.results || [];
+          if (heroSrc.length) {
+            this.heroMovie = heroSrc[Math.floor(Math.random() * Math.min(8, heroSrc.length))];
+            this.heroType = this.heroMovie?.media_type === 'tv' ? 'tv' : 'movie';
+          }
+
+          // Sections
+          this.setSection('trending', trending?.results);
+          this.setSection('now_playing', nowPlaying?.results);
+          this.setSection('top_rated', topRated?.results);
+          this.setSection('popular', popular?.results);
+          this.setSection('series', series?.results);
+          this.setSection('upcoming', upcoming?.results);
+
+          // Welcome toast
+          setTimeout(() => this.showToast('Selamat datang di CINEPLEX! 🎬', '💜'), 1200);
+        },
+
+        setSection(id, data) {
+          const s = this.sections.find(x => x.id === id);
+          if (s) { s.movies = data || []; s.loading = false; }
+        },
+
+        // ── Particles ──
+        spawnParticles() {
+          const c = document.getElementById('hero-particles');
+          if (!c) return;
+          for (let i = 0; i < 20; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const sz = Math.random() * 4 + 2;
+            p.style.cssText = `left:${Math.random()*100}%;width:${sz}px;height:${sz}px;--dur:${Math.random()*12+8}s;--delay:${Math.random()*10}s;--op:${Math.random()*0.4+0.1}`;
+            c.appendChild(p);
+          }
+        },
+
+        // ── Scroll ──
+        initScroll() {
+          window.addEventListener('scroll', () => { this.scrolled = window.scrollY > 40; }, { passive: true });
+        },
+
+        // ── Navigation ──
+        goHome() { this.clearSearch(); window.scrollTo({ top: 0, behavior: 'smooth' }); this.activeTab = 'home'; },
+
+        setTab(id) {
+          this.activeTab = id;
+          if (id !== 'home') {
+            this.$nextTick(() => {
+              const el = document.getElementById(`section-${id}`) || document.querySelector('.main-content');
+              el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+          } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+          this.mobileMenuOpen = false;
+        },
+
+        // ── Filter Tahun Rilis ──
+        async selectYear(year) {
+          this.selectedYear = year;
+          this.yearDropdownOpen = false;
+
+          if (!year) {
+            this.yearMovies = [];
+            this.showToast('Filter tahun dinonaktifkan', '✨');
+            return;
+          }
+
+          this.yearLoading = true;
+          this.showToast(`Memuat film rilis ${year}...`, '📅');
+
+          // Scroll ke seksi tahun
+          this.$nextTick(() => {
+            const el = document.getElementById('section-year');
+            el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          });
+
+          try {
+            const data = await fetchMoviesWithFallback('/discover/movie', {
+              primary_release_year: year,
+              sort_by: 'popularity.desc',
+              page: 1
+            });
+            this.yearMovies = (data?.results || []).filter(m => m.poster_path);
+          } catch(e) {
+            console.error(e);
+            this.showToast(`Gagal memuat film tahun ${year}`, '❌');
+          } finally {
+            this.yearLoading = false;
+          }
+        },
+
+        // ── Search ──
+        async doSearch() {
+          const q = this.searchQuery.trim();
+          if (!q) { this.clearSearch(); return; }
+          this.searchActive = true;
+          this.searchLoading = true;
+          this.searchResults = [];
+          try {
+            const data = await fetchMoviesWithFallback('/search/multi', { query: q, include_adult: false });
+            this.searchResults = (data?.results || []).filter(r => r.media_type !== 'person' && r.poster_path);
+          } catch(e) {
+            this.showToast('Gagal melakukan pencarian', '❌');
+          } finally {
+            this.searchLoading = false;
+          }
+        },
+
+        clearSearch() {
+          this.searchQuery = '';
+          this.searchActive = false;
+          this.searchResults = [];
+          this.searchOpen = false;
+        },
+
+        // ── Genre Filter ──
+        applyGenreFilter() {},
+
+        getFilteredMovies(section) {
+          if (!this.filterGenre) return section.movies;
+          return section.movies.filter(m => m.genre_ids?.includes(this.filterGenre));
+        },
+
+        // ── Slider scroll ──
+        scrollSlider(id, dir) {
+          const el = document.getElementById(`slider-${id}`);
+          if (el) el.scrollBy({ left: dir * el.clientWidth * 0.72, behavior: 'smooth' });
+        },
+
+        // ── Modal ──
+        async openModal(movie, type = 'movie') {
+          if (!movie) return;
+          this.showModal = true;
+          this.modalLoading = true;
+          this.selectedMovie = null;
+          this.cast = [];
+          this.similarMovies = [];
+          this.trailers = [];
+          this.currentTrailerIndex = 0;
+          this.activeTrailerUrl = '';
+          this.currentModalType = type;
+          document.body.style.overflow = 'hidden';
+
+          try {
+            const [detailId, detailEn, credits, similar, trailersList] = await Promise.all([
+              tmdb(`/${type}/${movie.id}`, { language: 'id-ID' }).catch(() => null),
+              tmdb(`/${type}/${movie.id}`, { language: 'en-US' }).catch(() => null),
+              tmdb(`/${type}/${movie.id}/credits`, { language: 'id-ID' }).catch(() => null),
+              fetchMoviesWithFallback(`/${type}/${movie.id}/similar`).catch(() => null),
+              fetchTrailers(type, movie.id),
+            ]);
+
+            const baseDetail = detailId || detailEn || movie;
+            const hasIdOverview = detailId?.overview && detailId.overview.trim().length > 0;
+            const enOverview = detailEn?.overview && detailEn.overview.trim().length > 0 ? detailEn.overview : '';
+
+            this.selectedMovie = {
+              ...baseDetail,
+              title: baseDetail.title || baseDetail.name || detailEn?.title || detailEn?.name || movie.title || movie.name,
+              overview: hasIdOverview ? detailId.overview : (enOverview || movie.overview || 'Sinopsis resmi belum tersedia.'),
+              isEnOverview: !hasIdOverview && !!enOverview,
+              tagline: (detailId?.tagline && detailId.tagline.trim()) ? detailId.tagline : (detailEn?.tagline || ''),
+              genres: (detailId?.genres && detailId.genres.length) ? detailId.genres : (detailEn?.genres || []),
+              runtime: baseDetail.runtime || detailEn?.runtime,
+              vote_average: baseDetail.vote_average ?? movie.vote_average ?? 0,
+              vote_count: baseDetail.vote_count ?? movie.vote_count ?? 0,
+              release_date: baseDetail.release_date || baseDetail.first_air_date || movie.release_date || movie.first_air_date,
+            };
+
+            this.cast = credits?.cast?.slice(0, 12) || [];
+            this.similarMovies = (similar?.results || []).filter(m => m.poster_path);
+            this.trailers = trailersList || [];
+          } catch(e) {
+            console.error(e);
+            this.showToast('Gagal memuat detail', '❌');
+            this.showModal = false;
+            document.body.style.overflow = '';
+          } finally {
+            this.modalLoading = false;
+          }
+        },
+
+        // ── Trailer Controls ──
+        openTrailer(index = 0) {
+          if (!this.trailers || this.trailers.length === 0) {
+            this.showToast('Trailer tidak tersedia untuk film ini', '🎬');
+            return;
+          }
+          this.currentTrailerIndex = Math.max(0, Math.min(index, this.trailers.length - 1));
+          const t = this.trailers[this.currentTrailerIndex];
+          if (t?.key) {
+            this.activeTrailerUrl = `https://www.youtube.com/embed/${t.key}?autoplay=1&enablejsapi=1&rel=0`;
+            this.showTrailerModal = true;
+          } else {
+            this.showToast('Video trailer tidak valid', '⚠️');
+          }
+        },
+
+        selectTrailer(index) {
+          if (this.currentTrailerIndex === index && this.activeTrailerUrl) return;
+          this.currentTrailerIndex = index;
+          const t = this.trailers[index];
+          if (t?.key) {
+            this.activeTrailerUrl = `https://www.youtube.com/embed/${t.key}?autoplay=1&enablejsapi=1&rel=0`;
+          }
+        },
+
+        closeTrailer() {
+          this.showTrailerModal = false;
+          this.activeTrailerUrl = '';
+          this.currentTrailerIndex = 0;
+        },
+
+        async playHeroTrailer() {
+          if (!this.heroMovie) return;
+          this.showToast('Memuat trailer...', '⏳');
+          try {
+            const list = await fetchTrailers(this.heroType, this.heroMovie.id);
+            if (list.length > 0) {
+              this.trailers = list;
+              this.openTrailer(0);
+            } else {
+              this.showToast('Trailer tidak ditemukan, membuka detail', '🎬');
+              this.openModal(this.heroMovie, this.heroType);
+            }
+          } catch (e) {
+            this.showToast('Gagal memuat trailer', '❌');
+          }
+        },
+
+        // ── Watchlist ──
+        toggleWatchlist(movie) {
+          if (!movie) return;
+          const idx = this.watchlist.findIndex(x => x.id === movie.id);
+          if (idx === -1) {
+            this.watchlist.push(movie);
+            this.showToast(`Ditambahkan: ${movie.title || movie.name}`, '🔖');
+          } else {
+            this.watchlist.splice(idx, 1);
+            this.showToast('Dihapus dari Watchlist', '🗑️');
+          }
+        },
+
+        removeFromWatchlist(id) {
+          this.watchlist = this.watchlist.filter(x => x.id !== id);
+          this.showToast('Dihapus dari Watchlist', '🗑️');
+        },
+
+        isInWatchlist(id) { return this.watchlist.some(x => x.id === id); },
+
+        // ── Likes ──
+        toggleLike(movie) {
+          if (!movie) return;
+          const idx = this.liked.findIndex(x => x === movie.id);
+          if (idx === -1) {
+            this.liked.push(movie.id);
+            this.showToast(`Disukai: ${movie.title || movie.name}`, '💜');
+          } else {
+            this.liked.splice(idx, 1);
+            this.showToast('Batal disukai', '🤍');
+          }
+        },
+
+        isLiked(id) { return this.liked.includes(id); },
+
+        // ── Share ──
+        async shareMovie(movie) {
+          const text = `${movie?.title || movie?.name} — Rating: ${movie?.vote_average?.toFixed(1)}/10`;
+          if (navigator.share) {
+            await navigator.share({ title: movie?.title || movie?.name, text, url: window.location.href });
+          } else {
+            await navigator.clipboard.writeText(text).catch(() => {});
+            this.showToast('Disalin ke clipboard!', '📋');
+          }
+        },
+
+        // ── Utilities ──
+        formatRuntime(m) {
+          if (!m) return '';
+          const h = Math.floor(m / 60), min = m % 60;
+          return h > 0 ? `${h}j ${min}m` : `${min}m`;
+        },
+
+        // ── Toast ──
+        showToast(msg, icon = '💜') {
+          const id = Date.now();
+          this.toasts.push({ id, msg, icon });
+          setTimeout(() => { this.toasts = this.toasts.filter(t => t.id !== id); }, 3500);
+        },
+
+        // ── Keyboard ──
+        handleEscape() {
+          if (this.yearDropdownOpen) { this.yearDropdownOpen = false; return; }
+          if (this.showTrailerModal) { this.closeTrailer(); return; }
+          if (this.showModal) { this.showModal = false; document.body.style.overflow = ''; return; }
+          if (this.showWatchlistPanel) { this.showWatchlistPanel = false; return; }
+          if (this.searchActive) { this.clearSearch(); return; }
+        },
+      };
+    }
+
+    // Fix: expose to window for Alpine x-data
+    window.cineplex = cineplex;
+  </script>
+</body>
+</html>
